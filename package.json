@@ -30,7 +30,11 @@
     "dtest": "./node_modules/mocha/bin/mocha test/*_test.js -G -w --reporter spec --slow 500"
   },
   "dependencies": {
-    "gextend": "^0.1.6"
+    "bluebird": "^3.0.5",
+    "gextend": "^0.1.6",
+    "hosts-path": "^1.0.0",
+    "president": "^2.0.0",
+    "temp": "^0.8.3"
   },
   "devDependencies": {
     "mocha-sinon": "^1.1.4",
