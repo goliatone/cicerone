@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+var Cicerone = require('..');
+
+// Cicerone.readHosts().then(console.log);
+// Cicerone.writeHosts('writeHosts').then(console.log);
+// Cicerone.addHost('12.34.56.78', 'goliat.dev').then(console.log);
+// Cicerone.removeHost('12.34.56.78', 'goliat.dev').then(console.log);
+Cicerone.hostsFileJSON(true).then(console.log);
+
+var hostfileJSON = require('../lib/hosts').hostfileJSON;
+var readHostsFile = require('../lib/hosts').readHostsFile;
+var writeFile = require('../lib/hosts').replaceHostsFile;
+var findCicerones = require('../lib/hosts').findCicerones;
+var addHost = require('../lib/hosts').addHost;
+
+// hostfileJSON().then(function(hosts){
+//     console.log(hosts);
+// });
+
+// findCicerones().then(function(hosts){
+//     console.log(hosts);
+// });
+
+// addHost('12.34.56.78', 'rone.dev');
+// readHostsFile().then(function(hosts){
+//     hosts += '\n#cicerone:start';
+//     hosts += '\n123.23.0.17\tpeperone.dev';
+//     hosts += '\n#cicerone:end';
+//
+//     writeFile(hosts)
+//     .then(function(){
+//         readHostsFile().then(console.log).catch(console.error);
+//     });
+// });
