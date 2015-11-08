@@ -1,34 +1,86 @@
 #!/usr/bin/env node
+require('yargonaut')
+  .style('cyan')
+  .helpStyle('green.bold')
+  .style('yellow', 'required');
+var Table = require('cli-table');
+// var Promise = require('bluebird');
+// var got = require('got-promise');
+// https://www.npmjs.com/package/ping
+var DEFAULT_LIST_ARGS =  {argv:{a:false}};
+
+var table = new Table({
+    head: ['IP', 'host'/*, 'active'*/],
+    colWidths: [25, 40/*, 15*/],
+    style : {compact : true, 'padding-left' : 2},
+    // chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
+    //      , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
+    //      , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
+    //      , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
+});
+
 var Cicerone = require('..');
+var argv = require('yargs')
+    .usage('Usage: $0 <command> [options]')
+    .command('list', 'Count the lines in a file', listCommand)
+    .option('a', {
+        alias: 'all',
+        describe: 'Including hosts not managed by "cicerone"',
+        type:'boolean'
+    })
+    .example('$0 list --all', 'count the lines in the given file')
+    .command('add', 'Add a new host entry', addCommand)
+    .option('i', {
+        alias: 'ip',
+        describe: 'IP of host to add or remove'
+    })
+    .option('d', {
+        alias:'domain',
+        describe:'Domain of host to add or remove'
+    })
+    .command('remove', 'Add a new host entry', removeCommand)
+    .version( function() {
+		return 'cicerone version: ' + require( '../package' ).version;
+	} )
+    .help('h')
+    .alias('h', 'help')
+    .alias( 'help', '?' )
+    .epilog('MIT License 2015')
+    .argv;
 
-// Cicerone.readHosts().then(console.log);
-// Cicerone.writeHosts('writeHosts').then(console.log);
-// Cicerone.addHost('12.34.56.78', 'goliat.dev').then(console.log);
-// Cicerone.removeHost('12.34.56.78', 'goliat.dev').then(console.log);
-Cicerone.hostsFileJSON(true).then(console.log);
+function addCommand(opts){
+    // console.log('here', opts.argv.i, opts.argv.h);
+    Cicerone.addHost(opts.argv.i, opts.argv.h).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+}
 
-var hostfileJSON = require('../lib/hosts').hostfileJSON;
-var readHostsFile = require('../lib/hosts').readHostsFile;
-var writeFile = require('../lib/hosts').replaceHostsFile;
-var findCicerones = require('../lib/hosts').findCicerones;
-var addHost = require('../lib/hosts').addHost;
+function removeCommand(opts){
+    // console.log('here', opts.argv.i, opts.argv.h);
+    Cicerone.removeHost(opts.argv.i, opts.argv.h).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+}
 
-// hostfileJSON().then(function(hosts){
-//     console.log(hosts);
-// });
+function listCommand(opts){
+    var all = opts.argv.a || opts.argv.all;
+    Cicerone.hostsFileJSON(true, all).then(function(hosts){
+        var domain, ip;
+        hosts.map(function(item){
+            domain = Object.keys(item)[0],
+            ip = item[domain];
+            table.push([ip, domain]);
+        });
+         console.log(table.toString());
+        // Promise.each(hosts, function(item) {
+        //     domain = Object.keys(item)[0],
+        //         ip = item[domain];
+        //         console.log('domain', domain)
+        //     return got(domain).then(function(res){
+        //         table.push([ip, domain, res.statusCode === 200 ? '√' : '†']);
+        //     }).catch(function(err){
+        //         table.push([ip, domain, '†']);
+        //     });
+        // }).then(function(results){
+        //     console.log(table.toString());
+        // });
 
-// findCicerones().then(function(hosts){
-//     console.log(hosts);
-// });
-
-// addHost('12.34.56.78', 'rone.dev');
-// readHostsFile().then(function(hosts){
-//     hosts += '\n#cicerone:start';
-//     hosts += '\n123.23.0.17\tpeperone.dev';
-//     hosts += '\n#cicerone:end';
-//
-//     writeFile(hosts)
-//     .then(function(){
-//         readHostsFile().then(console.log).catch(console.error);
-//     });
-// });
+        // console.log(hosts);
+    });
+}
