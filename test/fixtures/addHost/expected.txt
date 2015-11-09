@@ -1,0 +1,16 @@
+##
+# hosts file
+##
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+fe80::1%lo0	localhost
+
+#######################
+# Managed by cicerone
+#######################
+#cicerone:start
+127.0.0.1	home.dev
+127.0.0.2	goliatone.net
+127.0.0.3	cicerone.dev
+#cicerone:end
