@@ -11,5 +11,5 @@ fe80::1%lo0	localhost
 #######################
 #cicerone:start
 127.0.0.1	home.dev
-127.0.0.3	goliatone.net
+127.0.0.2	goliatone.net
 #cicerone:end
