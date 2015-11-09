@@ -39,23 +39,43 @@ var argv = require('yargs')
         describe:'Domain of host to add or remove'
     })
     .command('remove', 'Add a new host entry', removeCommand)
+    .command('json', 'Add hosts entries from JSON file', jsonCommand)
     .version( function() {
 		return 'cicerone version: ' + require( '../package' ).version;
-	} )
+	})
     .help('h')
     .alias('h', 'help')
     .alias( 'help', '?' )
     .epilog('MIT License 2015')
     .argv;
 
+function jsonCommand(opts){
+    var filepath = opts.argv.f || opts.argv.file;
+    console.log(filepath);
+    var file = require('fs').readFileSync(filepath, 'utf-8');
+    var data = JSON.parse(file);
+    data.hosts.map(function(item){
+        addCommand(item);
+        // console.log(item);
+    });
+}
+
 function addCommand(opts){
-    // console.log('here', opts.argv.i, opts.argv.h);
-    Cicerone.addHost(opts.argv.i, opts.argv.h).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    var item = opts.argv || opts;
+    var host = item.h || item.host,
+        ip = item.i || item.ip;
+        addHost(ip, host);
+}
+function addHost(ip, host){
+    // console.log(ip, host)
+    Cicerone.addHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function removeCommand(opts){
-    // console.log('here', opts.argv.i, opts.argv.h);
-    Cicerone.removeHost(opts.argv.i, opts.argv.h).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    var item = opts.argv || opts;
+    var host = item.h || item.host,
+        ip = item.i || item.ip;
+    Cicerone.removeHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function listCommand(opts){
