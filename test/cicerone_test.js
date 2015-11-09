@@ -20,6 +20,7 @@ test('Cicerone removeHost', function(t){
     cicerone.removeHost('127.0.0.2', 'cicerone.dev').then(function(hosts){
         t.equal(hosts, fixtureFile('removeHost/expected.txt'), 'Should read hosts file');
         t.end();
+        cleanHosts();
     });
 });
 
@@ -35,4 +36,8 @@ function makeHosts(filepath){
     fs.writeFileSync(destfile, content, 'utf-8');
 
     process.env.CICERONE_PATH = destfile;
+}
+
+function cleanHosts(){
+    fs.unlinkSync(process.env.CICERONE_PATH);
 }
