@@ -17,8 +17,17 @@ test('Cicerone readHosts', function (t) {
 
 test('Cicerone removeHost', function(t){
     makeHosts('removeHost/hosts.txt');
-    cicerone.removeHost('127.0.0.2', 'cicerone.dev').then(function(hosts){
-        t.equal(hosts, fixtureFile('removeHost/expected.txt'), 'Should read hosts file');
+    cicerone.removeHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
+        t.equal(hosts, fixtureFile('removeHost/expected.txt'), 'Should remove host entry');
+        t.end();
+        cleanHosts();
+    });
+});
+
+test('Cicerone addHost', function(t){
+    makeHosts('addHost/hosts.txt');
+    cicerone.addHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
+        t.equal(hosts, fixtureFile('addHost/expected.txt'), 'Should add host entry');
         t.end();
         cleanHosts();
     });
