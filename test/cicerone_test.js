@@ -15,6 +15,14 @@ test('Cicerone readHosts', function (t) {
     });
 });
 
+test('Cicerone getHosts', function (t) {
+    process.env.CICERONE_PATH = fixture('getHosts/hosts.txt');
+    cicerone.getHosts().then(function(result){
+        t.equal(result, fixtureFile('getHosts/expected.txt'), 'Should read full hosts file');
+        t.end();
+    });
+});
+
 test('Cicerone removeHost', function(t){
     makeHosts('removeHost/hosts.txt');
     cicerone.removeHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
