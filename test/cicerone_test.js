@@ -7,28 +7,21 @@ var fixture = path.resolve.bind(path, __dirname, 'fixtures');
 var test = require('tape');
 var cicerone = require('..');
 
-test('Cicerone readHosts', function (t) {
-    process.env.CICERONE_PATH = fixture('readHosts/hosts.txt');
-    cicerone.readHosts().then(function(result){
-        t.equal(result, fixtureFile('readHosts/hosts.txt'), 'Should read hosts file');
-        t.end();
-    });
-});
-
-test('Cicerone getHosts', function (t) {
-    process.env.CICERONE_PATH = fixture('getHosts/hosts.txt');
-    cicerone.getHosts().then(function(result){
-        t.equal(result, fixtureFile('getHosts/expected.txt'), 'Should read full hosts file');
-        t.end();
-    });
-});
-
 test('Cicerone removeHost', function(t){
     makeHosts('removeHost/hosts.txt');
     cicerone.removeHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
         t.equal(hosts, fixtureFile('removeHost/expected.txt'), 'Should remove host entry');
-        t.end();
         cleanHosts();
+        t.end();
+    });
+});
+
+test('Cicerone readHosts', function (t) {
+    makeHosts('readHosts/hosts.txt');
+    cicerone.readHosts().then(function(result){
+        t.equal(result, fixtureFile('readHosts/hosts.txt'), 'Should read hosts file');
+        cleanHosts();
+        t.end();
     });
 });
 
@@ -36,10 +29,21 @@ test('Cicerone addHost', function(t){
     makeHosts('addHost/hosts.txt');
     cicerone.addHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
         t.equal(hosts, fixtureFile('addHost/expected.txt'), 'Should add host entry');
-        t.end();
         cleanHosts();
+        t.end();
     });
 });
+
+test('Cicerone getHosts', function (t) {
+    makeHosts('getHosts/hosts.txt');
+    cicerone.getHosts().then(function(result){
+        t.equal(result, fixtureFile('getHosts/expected.txt'), 'Should read full hosts file');
+        cleanHosts();
+        t.end();
+    });
+});
+
+
 
 function fixtureFile(filepath){
     return readFile(fixture(filepath), 'utf-8');
