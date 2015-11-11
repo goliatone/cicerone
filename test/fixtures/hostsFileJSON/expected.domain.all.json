@@ -1,0 +1,23 @@
+[
+    {
+        "localhost": "127.0.0.1"
+    },
+    {
+        "broadcasthost": "255.255.255.255"
+    },
+    {
+        "localhost": "::1"
+    },
+    {
+        "localhost": "fe80::1%lo0"
+    },
+    {
+        "home.dev": "127.0.0.1"
+    },
+    {
+        "goliatone.net": "127.0.0.2"
+    },
+    {
+        "cicerone.dev": "127.0.0.3"
+    }
+]
