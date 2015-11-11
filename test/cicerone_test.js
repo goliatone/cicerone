@@ -10,7 +10,7 @@ var cicerone = require('..');
 test('Cicerone removeHost', function(t){
     makeHosts('removeHost/hosts.txt');
     cicerone.removeHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
-        t.equal(hosts, fixtureFile('removeHost/expected.txt'), 'Should remove host entry');
+        t.equal(hosts, loadFixture('removeHost/expected.txt'), 'Should remove host entry');
         cleanHosts();
         t.end();
     });
@@ -19,7 +19,7 @@ test('Cicerone removeHost', function(t){
 test('Cicerone readHosts', function (t) {
     makeHosts('readHosts/hosts.txt');
     cicerone.readHosts().then(function(result){
-        t.equal(result, fixtureFile('readHosts/hosts.txt'), 'Should read hosts file');
+        t.equal(result, loadFixture('readHosts/hosts.txt'), 'Should read hosts file');
         cleanHosts();
         t.end();
     });
@@ -28,7 +28,7 @@ test('Cicerone readHosts', function (t) {
 test('Cicerone addHost', function(t){
     makeHosts('addHost/hosts.txt');
     cicerone.addHost('127.0.0.3', 'cicerone.dev').then(function(hosts){
-        t.equal(hosts, fixtureFile('addHost/expected.txt'), 'Should add host entry');
+        t.equal(hosts, loadFixture('addHost/expected.txt'), 'Should add host entry');
         cleanHosts();
         t.end();
     });
@@ -37,26 +37,86 @@ test('Cicerone addHost', function(t){
 test('Cicerone getHosts', function (t) {
     makeHosts('getHosts/hosts.txt');
     cicerone.getHosts().then(function(result){
-        t.equal(result, fixtureFile('getHosts/expected.txt'), 'Should read full hosts file');
+        t.equal(result, loadFixture('getHosts/expected.txt'), 'Should read full hosts file');
         cleanHosts();
         t.end();
     });
 });
 
+test('Cicerone hostToObject:domainFirst', function(t){
+    var line = loadFixture('hostToObject/line.txt');
+    var result = cicerone.hostToObject(true, line);
+    var expected = loadFixture('hostToObject/expected.domain.json');
+    t.deepEqual(result, expected);
+    t.end();
+});
 
+test('Cicerone hostToObject:ipFirst', function(t){
+    var line = loadFixture('hostToObject/line.txt');
+    var result = cicerone.hostToObject(false, line);
+    var expected = loadFixture('hostToObject/expected.ip.json');
+    t.deepEqual(result, expected);
+    t.end();
+});
 
-function fixtureFile(filepath){
-    return readFile(fixture(filepath), 'utf-8');
-}
+test('Cicerone hostsFileJSON', function(t){
+    makeHosts('hostsFileJSON/hosts.txt');
+    cicerone.hostsFileJSON(true, true).then(function(result){
+        t.deepEqual(result, loadFixture('hostsFileJSON/expected.domain.all.json'), 'Should get domain first all hosts in JSON');
+        cleanHosts();
+        t.end();
+    });
+});
+
+test('Cicerone hostsFileJSON', function(t){
+    makeHosts('hostsFileJSON/hosts.txt');
+    cicerone.hostsFileJSON(false, true).then(function(result){
+        t.deepEqual(result, loadFixture('hostsFileJSON/expected.ip.all.json'), 'Should get ip first all hosts in JSON');
+        cleanHosts();
+        t.end();
+    });
+});
+
+test('Cicerone hostsFileJSON', function(t){
+    makeHosts('hostsFileJSON/hosts.txt');
+    cicerone.hostsFileJSON(false, false).then(function(result){
+        t.deepEqual(result, loadFixture('hostsFileJSON/expected.ip.json'), 'Should get ip first cicerone hosts in JSON');
+        cleanHosts();
+        t.end();
+    });
+});
+
+test('Cicerone hostsFileJSON', function(t){
+    makeHosts('hostsFileJSON/hosts.txt');
+    cicerone.hostsFileJSON(true, false).then(function(result){
+        t.deepEqual(result, loadFixture('hostsFileJSON/expected.domain.json'), 'Should get domain first cicerone hosts in JSON');
+        cleanHosts();
+        t.end();
+    });
+});
+//////////////////////////////////////
+/// FIXTURE HELPERS
+//////////////////////////////////////
+
 
 function makeHosts(filepath){
     //copy file
-    filepath = fixture(filepath);
     var destfile = fixture(filepath) + '.tmp',
-        content = fs.readFileSync(filepath, 'utf-8');
+        content = loadFixture(filepath);
     fs.writeFileSync(destfile, content, 'utf-8');
-
     process.env.CICERONE_PATH = destfile;
+}
+
+function loadFixture(filepath){
+    var mock = readFile(fixture(filepath), 'utf-8')
+    if(path.extname(filepath) === '.json'){
+        try{
+            mock = JSON.parse(mock);
+        } catch(e){
+            throw new Error('Error parsing mock file ' + filepath);
+        }
+    }
+    return mock;
 }
 
 function cleanHosts(){
