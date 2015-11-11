@@ -29,6 +29,11 @@ var argv = require('yargs')
         type:'boolean'
     })
     .example('$0 list --all', 'count the lines in the given file')
+    .option('D', {
+        alias: 'domainFirst',
+        describe: 'List items with domain first',
+        type: 'boolean'
+    })
     .command('add', 'Add a new host entry', addCommand)
     .option('i', {
         alias: 'ip',
@@ -80,8 +85,11 @@ function removeCommand(opts){
 
 function listCommand(opts){
     var all = opts.argv.a || opts.argv.all;
-    Cicerone.hostsFileJSON(true, all).then(function(hosts){
+    var domainFirst = opts.argv.D || opts.argv.domainFirst;
+
+    Cicerone.hostsFileJSON(domainFirst, all).then(function(hosts){
         var domain, ip;
+        console.log(JSON.stringify(hosts, null, 4))
         hosts.map(function(item){
             domain = Object.keys(item)[0],
             ip = item[domain];
