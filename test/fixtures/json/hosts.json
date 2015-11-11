@@ -1,0 +1,6 @@
+{
+  "hosts":[
+    {"ip":"23.43.56.54", "host":"package.dev"},
+    {"ip":"54.32.34.34", "host":"moon.dev"}
+   ]
+}
