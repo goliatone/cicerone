@@ -34,10 +34,21 @@ test('Cicerone addHost', function(t){
     });
 });
 
-test('Cicerone getHosts', function (t) {
-    makeHosts('getHosts/hosts.txt');
-    cicerone.getHosts().then(function(result){
-        t.equal(result, loadFixture('getHosts/expected.txt'), 'Should read full hosts file');
+test('Cicerone addHosts', function(t){
+    makeHosts('addHosts/hosts.txt');
+    var hosts = loadFixture('addHosts/hosts.json');
+    cicerone.addHosts(hosts).then(function(hosts){
+        console.log(hosts)
+        t.equal(hosts, loadFixture('addHosts/expected.txt'), 'Should add host entry');
+        cleanHosts();
+        t.end();
+    });
+});
+
+test('Cicerone getAllHosts', function (t) {
+    makeHosts('getAllHosts/hosts.txt');
+    cicerone.getAllHosts().then(function(result){
+        t.equal(result, loadFixture('getAllHosts/expected.txt'), 'Should read full hosts file');
         cleanHosts();
         t.end();
     });
