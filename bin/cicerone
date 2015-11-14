@@ -3,8 +3,9 @@ require('yargonaut')
   .style('cyan')
   .helpStyle('green.bold')
   .style('yellow', 'required');
+
 var Table = require('cli-table');
-// var Promise = require('bluebird');
+var Promise = require('bluebird');
 // var got = require('got-promise');
 // https://www.npmjs.com/package/ping
 var DEFAULT_LIST_ARGS =  {argv:{a:false}};
@@ -45,6 +46,10 @@ var argv = require('yargs')
     })
     .command('remove', 'Add a new host entry', removeCommand)
     .command('json', 'Add hosts entries from JSON file', jsonCommand)
+    .option('f', {
+        alias:'file',
+        describe: 'JSON file with a top level object with an hosts array attribute'
+    })
     .version( function() {
 		return 'cicerone version: ' + require( '../package' ).version;
 	})
@@ -56,40 +61,43 @@ var argv = require('yargs')
 
 function jsonCommand(opts){
     var filepath = opts.argv.f || opts.argv.file;
-    console.log(filepath);
     var file = require('fs').readFileSync(filepath, 'utf-8');
     var data = JSON.parse(file);
-    data.hosts.map(function(item){
-        addCommand(item);
-        // console.log(item);
-    });
+    Promise.each(data.hosts, function(item){
+        return Cicerone.addHost(item.ip, item.domain);
+    }).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    // data.hosts.map(function(item){
+    //     addCommand(item);
+    // });
 }
 
 function addCommand(opts){
     var item = opts.argv || opts;
-    var host = item.h || item.host,
+    var host = item.d || item.domain,
         ip = item.i || item.ip;
-        addHost(ip, host);
+    return addHost(ip, host);
 }
 function addHost(ip, host){
     // console.log(ip, host)
-    Cicerone.addHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    return Cicerone.addHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function removeCommand(opts){
     var item = opts.argv || opts;
-    var host = item.h || item.host,
+    var host = item.d || item.domain,
         ip = item.i || item.ip;
-    Cicerone.removeHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    //TODO: Assert that ip and domain are valid
+    console.log(ip, host);
+    return Cicerone.removeHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function listCommand(opts){
     var all = opts.argv.a || opts.argv.all;
     var domainFirst = opts.argv.D || opts.argv.domainFirst;
 
-    Cicerone.hostsFileJSON(domainFirst, all).then(function(hosts){
+    return Cicerone.hostsFileJSON(domainFirst, all).then(function(hosts){
         var domain, ip;
-        console.log(JSON.stringify(hosts, null, 4))
+        // console.log(JSON.stringify(hosts, null, 4))
         hosts.map(function(item){
             domain = Object.keys(item)[0],
             ip = item[domain];
