@@ -50,6 +50,7 @@ var argv = require('yargs')
         alias:'file',
         describe: 'JSON file with a top level object with an hosts array attribute'
     })
+    .command('find', 'Find a host either by ip or by domain', findCommand)
     .version( function() {
 		return 'cicerone version: ' + require( '../package' ).version;
 	})
@@ -66,29 +67,18 @@ function jsonCommand(opts){
     Promise.each(data.hosts, function(item){
         return Cicerone.addHost(item.ip, item.domain);
     }).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
-    // data.hosts.map(function(item){
-    //     addCommand(item);
-    // });
 }
 
 function addCommand(opts){
-    var item = opts.argv || opts;
-    var host = item.d || item.domain,
-        ip = item.i || item.ip;
-    return addHost(ip, host);
-}
-function addHost(ip, host){
-    // console.log(ip, host)
-    return Cicerone.addHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    var item = normalizeArgs(opts).argv;
+    return Cicerone.addHost(item.ip, item.domain).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function removeCommand(opts){
-    var item = opts.argv || opts;
-    var host = item.d || item.domain,
-        ip = item.i || item.ip;
+    var item = normalizeArgs(opts).argv;
     //TODO: Assert that ip and domain are valid
-    console.log(ip, host);
-    return Cicerone.removeHost(ip, host).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
+    console.log(item.ip, item.domain);
+    return Cicerone.removeHost(item.ip, item.domain).then(listCommand.bind(null, DEFAULT_LIST_ARGS));
 }
 
 function listCommand(opts){
@@ -119,4 +109,18 @@ function listCommand(opts){
 
         // console.log(hosts);
     });
+}
+
+function findCommand(opts){
+    var item = normalizeArgs(opts).argv;
+    return Cicerone.find(item).then(function(host){
+        console.log(host.ip, '\t', host.domain);
+        return host;
+    });
+}
+function normalizeArgs(opts){
+    var item = opts.argv || opts;
+    item.domain = item.d || item.domain,
+    item.ip = item.i || item.ip;
+    return opts;
 }

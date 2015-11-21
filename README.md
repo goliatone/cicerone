@@ -25,3 +25,6 @@ _(Nothing yet)_
 ## License
 Copyright (c) 2015 goliatone  
 Licensed under the MIT license.
+
+match an ip tab domain:
+/(([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3}))[\s]+((?:[A-Za-z0-9]\.?)([A-Za-z0-9\-]{0,61}\.[A-Za-z]{2,6}))/
